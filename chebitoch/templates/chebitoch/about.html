@@ -1,0 +1,169 @@
+{% extends 'chebitoch/base.html' %}
+
+{% block title %}About - Chebitoch{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="bg-gradient-to-br from-purple-600 via-indigo-600 to-purple-800 relative overflow-hidden">
+    <div class="absolute inset-0 opacity-10">
+        <div class="absolute top-0 -left-4 w-96 h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl"></div>
+        <div class="absolute bottom-0 -right-4 w-96 h-96 bg-indigo-300 rounded-full mix-blend-multiply filter blur-3xl"></div>
+    </div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+        <div class="text-center">
+            <div class="w-32 h-32 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl">
+                <span class="text-6xl font-bold gradient-text">C</span>
+            </div>
+            <h1 class="text-5xl md:text-6xl font-extrabold text-white mb-6">
+                About Me
+            </h1>
+            <p class="text-xl text-purple-100 max-w-2xl mx-auto">
+                Welcome to my corner of the internet where I share my journey, thoughts, and experiences.
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <!-- Story Section -->
+    <section class="mb-16">
+        <div class="bg-white rounded-2xl shadow-xl p-8 md:p-12 border border-purple-100">
+            <h2 class="text-3xl md:text-4xl font-bold gradient-text mb-6">My Story</h2>
+            <div class="prose prose-lg max-w-none text-gray-700 leading-relaxed space-y-4">
+                <p>
+                    Hello! I'm Eliphaz, and this is my personal blog where I share my thoughts, experiences, and learnings.
+                    This space is a reflection of my journey through technology, life, and everything that inspires me along the way.
+                </p>
+                <p>
+                    I created this blog to document my experiences, share knowledge with others, and connect with like-minded individuals
+                    who are passionate about learning and growing. Whether you're here for technical insights, personal stories, or just
+                    curious about my perspective on things, I'm glad you're here.
+                </p>
+                <p>
+                    Through this platform, I aim to create content that is both informative and engaging. Every post is crafted with care,
+                    hoping to provide value to readers and contribute to the broader community of learners and creators.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- What I Write About -->
+    <section class="mb-16">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-8 text-center">What I Write About</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-2xl p-6 border-2 border-purple-200 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+                <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-xl flex items-center justify-center mb-4">
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-3">Technology</h3>
+                <p class="text-gray-600">Exploring the latest in web development, programming, and digital innovation.</p>
+            </div>
+
+            <div class="bg-gradient-to-br from-pink-50 to-purple-50 rounded-2xl p-6 border-2 border-pink-200 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+                <div class="w-16 h-16 bg-gradient-to-br from-pink-500 to-purple-500 rounded-xl flex items-center justify-center mb-4">
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-3">Learning</h3>
+                <p class="text-gray-600">Sharing insights, lessons learned, and personal growth experiences.</p>
+            </div>
+
+            <div class="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl p-6 border-2 border-indigo-200 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+                <div class="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-xl flex items-center justify-center mb-4">
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-3">Life & Stories</h3>
+                <p class="text-gray-600">Personal reflections, experiences, and stories from my journey.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Values Section -->
+    <section class="mb-16">
+        <div class="bg-gradient-to-br from-purple-600 to-indigo-600 rounded-2xl p-8 md:p-12 text-white shadow-2xl">
+            <h2 class="text-3xl md:text-4xl font-bold mb-8 text-center">My Values</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="flex items-start space-x-4">
+                    <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold mb-2">Authenticity</h3>
+                        <p class="text-purple-100">Being genuine and true to myself in everything I share.</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start space-x-4">
+                    <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold mb-2">Continuous Growth</h3>
+                        <p class="text-purple-100">Always learning, evolving, and pushing boundaries.</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start space-x-4">
+                    <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold mb-2">Community</h3>
+                        <p class="text-purple-100">Contributing to and learning from the community.</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start space-x-4">
+                    <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold mb-2">Quality</h3>
+                        <p class="text-purple-100">Creating thoughtful, well-crafted content.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Get in Touch -->
+    <section class="text-center">
+        <div class="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-2xl p-12 border-2 border-purple-200">
+            <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Let's Connect</h2>
+            <p class="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+                I'd love to hear from you! Whether you have questions, suggestions, or just want to say hello,
+                feel free to reach out through social media or leave a comment on any post.
+            </p>
+            <div class="flex justify-center space-x-4">
+
+                    <a href="#" class="footer-social-icon" aria-label="Facebook" title="Follow me on Facebook">
+                        <i class="fab fa-facebook-f text-white"></i>
+                    </a>
+                    <a href="#" class="footer-social-icon" aria-label="X (Twitter)" title="Follow me on X">
+                        <i class="fab fa-x-twitter text-white"></i>
+                    </a>
+                    <a href="#" class="footer-social-icon footer-social-instagram" aria-label="Instagram"
+                       title="Follow me on Instagram">
+                        <i class="fab fa-instagram text-white"></i>
+                    </a>
+
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}
