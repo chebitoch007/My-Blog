@@ -3,161 +3,125 @@
 {% block title %}{{ post.title }} - Chebitoch{% endblock %}
 
 {% block content %}
-<article class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <!-- Breadcrumb -->
-    <nav class="flex items-center space-x-2 text-sm text-gray-500 mb-8">
-        <a href="{% url 'home' %}" class="hover:text-purple-600 transition-colors">Home</a>
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-        </svg>
-        {% if post.category %}
-        <a href="{% url 'category_posts' post.category.slug %}" class="hover:text-purple-600 transition-colors">{{ post.category.name }}</a>
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-        </svg>
-        {% endif %}
-        <span class="text-gray-700">{{ post.title|truncatewords:5 }}</span>
-    </nav>
-
-    <!-- Post Header -->
-    <header class="mb-10">
-        {% if post.category %}
-        <div class="mb-4">
-            <a href="{% url 'category_posts' post.category.slug %}" class="inline-block px-4 py-2 bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-full text-sm font-semibold hover:shadow-lg transition-all">
-                {{ post.category.name }}
-            </a>
-        </div>
-        {% endif %}
-
-        <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 mb-6 leading-tight">
-            {{ post.title }}
-        </h1>
-
-        <div class="flex flex-wrap items-center gap-6 text-gray-600 mb-8">
-            <div class="flex items-center">
-                <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-full flex items-center justify-center text-white font-bold text-lg mr-3">
-                    {{ post.author.username|slice:":1"|upper }}
-                </div>
-                <div>
-                    <p class="font-semibold text-gray-900">{{ post.author.username }}</p>
-                    <p class="text-sm text-gray-500">Author</p>
-                </div>
-            </div>
-
-            <div class="flex items-center">
-                <svg class="w-5 h-5 mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                </svg>
-                <span>{{ post.created_at|date:"F d, Y" }}</span>
-            </div>
-
-            <div class="flex items-center">
-                <svg class="w-5 h-5 mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                <span>{{ post.content|wordcount }} words</span>
-            </div>
-        </div>
-    </header>
-
-    <!-- Featured Image -->
+<div class="relative h-[50vh] min-h-[400px] w-full overflow-hidden">
+    <div class="absolute inset-0 bg-slate-900/60 z-10"></div>
     {% if post.featured_image %}
-    <div class="mb-12 rounded-2xl overflow-hidden shadow-2xl">
-        <img src="{{ post.featured_image }}" alt="{{ post.title }}" class="w-full h-auto">
-    </div>
+    <img src="{{ post.featured_image }}" class="absolute inset-0 w-full h-full object-cover">
+    {% else %}
+    <div class="absolute inset-0 bg-gradient-to-r from-violet-600 to-indigo-600"></div>
     {% endif %}
 
-    <!-- Post Content -->
-    <div class="prose prose-lg max-w-none mb-16">
-        <div class="bg-gradient-to-r from-purple-50 to-indigo-50 border-l-4 border-purple-500 p-6 rounded-r-xl mb-8">
-            <p class="text-gray-700 text-lg leading-relaxed">{{ post.content|linebreaksbr }}</p>
+    <div class="absolute inset-0 z-20 flex items-center justify-center">
+        <div class="max-w-4xl px-4 text-center text-white">
+            {% if post.category %}
+            <a href="{% url 'category_posts' post.category.slug %}" class="inline-block px-4 py-1.5 border border-white/30 bg-white/10 backdrop-blur-md rounded-full text-sm font-bold uppercase tracking-wider mb-6 hover:bg-white/20 transition-colors">
+                {{ post.category.name }}
+            </a>
+            {% endif %}
+            <h1 class="text-3xl md:text-5xl lg:text-6xl font-extrabold mb-6 leading-tight tracking-tight drop-shadow-lg">
+                {{ post.title }}
+            </h1>
+            <div class="flex items-center justify-center space-x-6 text-sm md:text-base text-white/90 font-medium">
+                <div class="flex items-center">
+                    <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center mr-2 text-xs">
+                        {{ post.author.username|slice:":1"|upper }}
+                    </div>
+                    {{ post.author.username }}
+                </div>
+                <span>&bull;</span>
+                <div>{{ post.created_at|date:"F d, Y" }}</div>
+                <span>&bull;</span>
+                <div>{{ post.get_read_time }} min read</div>
+            </div>
         </div>
     </div>
+</div>
 
-    <!-- Tags/Social Share Section -->
-    <div class="border-t border-b border-gray-200 py-8 mb-12">
-        <div class="flex flex-wrap items-center justify-between gap-4">
-            <div class="flex items-center space-x-3">
-                <span class="text-gray-600 font-semibold">Share:</span>
-                <button class="w-10 h-10 bg-blue-600 hover:bg-blue-700 text-white rounded-full flex items-center justify-center transition-colors">
-                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-                </button>
-                <button class="w-10 h-10 bg-sky-500 hover:bg-sky-600 text-white rounded-full flex items-center justify-center transition-colors">
-                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/></svg>
-                </button>
-                <button class="w-10 h-10 bg-gray-700 hover:bg-gray-800 text-white rounded-full flex items-center justify-center transition-colors">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path>
-                    </svg>
-                </button>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-20 relative z-30 pb-20">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+
+        <article class="lg:col-span-8 bg-white rounded-2xl shadow-xl p-8 md:p-12 border border-slate-100">
+            <div class="prose prose-lg prose-slate max-w-none
+                        prose-headings:font-bold prose-headings:text-slate-900
+                        prose-a:text-violet-600 hover:prose-a:text-violet-500
+                        prose-img:rounded-2xl prose-img:shadow-lg
+                        prose-blockquote:border-l-4 prose-blockquote:border-violet-500 prose-blockquote:bg-slate-50 prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:rounded-r-lg">
+                {{ post.content|linebreaks }}
             </div>
 
-            <a href="{% url 'home' %}" class="inline-flex items-center text-purple-600 hover:text-purple-700 font-semibold transition-colors">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-                </svg>
-                Back to Blog
-            </a>
-        </div>
-    </div>
+            <div class="mt-12 pt-8 border-t border-slate-100">
+                <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wide mb-4">Share this post</h3>
+                <div class="flex space-x-3">
+                    <button class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-all flex items-center justify-center">
+                        <i class="fab fa-facebook-f"></i>
+                    </button>
+                    <button class="w-10 h-10 rounded-full bg-sky-50 text-sky-500 hover:bg-sky-500 hover:text-white transition-all flex items-center justify-center">
+                        <i class="fab fa-twitter"></i>
+                    </button>
+                    <button class="w-10 h-10 rounded-full bg-green-50 text-green-600 hover:bg-green-600 hover:text-white transition-all flex items-center justify-center">
+                        <i class="fab fa-whatsapp"></i>
+                    </button>
+                </div>
+            </div>
+        </article>
 
-    <!-- Comments Section -->
-    <section class="mb-12">
-        <h2 class="text-3xl font-bold text-gray-900 mb-8">
-            Comments <span class="text-purple-600">({{ comments|length }})</span>
+        <aside class="lg:col-span-4 space-y-8">
+            <div class="bg-white rounded-2xl shadow-lg p-8 border border-slate-100 text-center sticky top-24">
+                <div class="w-20 h-20 bg-gradient-to-br from-violet-500 to-fuchsia-500 rounded-full mx-auto flex items-center justify-center text-3xl font-bold text-white mb-4 shadow-lg ring-4 ring-white">
+                    {{ post.author.username|slice:":1"|upper }}
+                </div>
+                <h3 class="text-xl font-bold text-slate-900">{{ post.author.username }}</h3>
+                <p class="text-slate-500 text-sm mb-6 mt-2">Content Creator & Tech Enthusiast</p>
+                <button class="w-full py-2.5 px-4 bg-slate-900 text-white rounded-xl hover:bg-violet-600 transition-colors text-sm font-bold shadow-lg hover:shadow-violet-500/30">
+                    Follow Author
+                </button>
+            </div>
+        </aside>
+
+    </div>
+</div>
+
+<div class="bg-slate-50 py-16 border-t border-slate-200">
+    <div class="max-w-3xl mx-auto px-4">
+        <h2 class="text-2xl font-bold text-slate-900 mb-8 flex items-center">
+            Comments <span class="ml-2 px-3 py-1 bg-violet-100 text-violet-600 text-sm rounded-full">{{ comments.count }}</span>
         </h2>
 
-        <!-- Comment Form -->
-        <div class="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-2xl p-8 mb-8 shadow-lg">
-            <h3 class="text-xl font-bold text-gray-900 mb-6">Leave a Comment</h3>
-            <form method="post" class="space-y-6">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 mb-12">
+            <h3 class="text-lg font-bold text-slate-900 mb-6">Leave a thought</h3>
+            <form method="post" class="space-y-4">
                 {% csrf_token %}
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label for="name" class="block text-sm font-semibold text-gray-700 mb-2">Name</label>
-                        <input type="text" id="name" name="name" required class="w-full px-4 py-3 rounded-lg border-2 border-purple-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all outline-none">
-                    </div>
-                    <div>
-                        <label for="email" class="block text-sm font-semibold text-gray-700 mb-2">Email</label>
-                        <input type="email" id="email" name="email" required class="w-full px-4 py-3 rounded-lg border-2 border-purple-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all outline-none">
-                    </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="text" name="name" placeholder="Name" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 outline-none transition-all">
+                    <input type="email" name="email" placeholder="Email" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 outline-none transition-all">
                 </div>
-                <div>
-                    <label for="content" class="block text-sm font-semibold text-gray-700 mb-2">Comment</label>
-                    <textarea id="content" name="content" rows="5" required class="w-full px-4 py-3 rounded-lg border-2 border-purple-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all outline-none resize-none"></textarea>
-                </div>
-                <button type="submit" class="px-8 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold rounded-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                <textarea name="content" rows="4" placeholder="Your comment..." required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 outline-none transition-all"></textarea>
+                <button type="submit" class="px-8 py-3 bg-violet-600 text-white font-bold rounded-xl hover:bg-violet-700 transition-colors shadow-lg hover:shadow-violet-500/25">
                     Post Comment
                 </button>
             </form>
         </div>
 
-        <!-- Comments List -->
         <div class="space-y-6">
             {% for comment in comments %}
-            <div class="bg-white rounded-xl p-6 shadow-md border border-purple-100 hover:shadow-lg transition-shadow">
-                <div class="flex items-start space-x-4">
-                    <div class="w-12 h-12 bg-gradient-to-br from-purple-400 to-indigo-400 rounded-full flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
+            <div class="flex space-x-4 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                <div class="flex-shrink-0">
+                    <div class="w-10 h-10 bg-violet-100 text-violet-600 rounded-full flex items-center justify-center font-bold">
                         {{ comment.name|slice:":1"|upper }}
                     </div>
-                    <div class="flex-1">
-                        <div class="flex items-center justify-between mb-2">
-                            <h4 class="font-bold text-gray-900">{{ comment.name }}</h4>
-                            <span class="text-sm text-gray-500">{{ comment.created_at|date:"F d, Y" }}</span>
-                        </div>
-                        <p class="text-gray-700 leading-relaxed">{{ comment.content }}</p>
+                </div>
+                <div>
+                    <div class="flex items-center space-x-2 mb-1">
+                        <h4 class="font-bold text-slate-900">{{ comment.name }}</h4>
+                        <span class="text-xs text-slate-400">&bull; {{ comment.created_at|timesince }} ago</span>
                     </div>
+                    <p class="text-slate-600 leading-relaxed">{{ comment.content }}</p>
                 </div>
             </div>
             {% empty %}
-            <div class="text-center py-12 bg-purple-50 rounded-xl">
-                <svg class="w-16 h-16 text-purple-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
-                </svg>
-                <p class="text-gray-600 font-medium">No comments yet. Be the first to share your thoughts!</p>
-            </div>
+            <p class="text-center text-slate-500 py-8 italic">No comments yet. Be the first to share your thoughts!</p>
             {% endfor %}
         </div>
-    </section>
-</article>
+    </div>
+</div>
 {% endblock %}

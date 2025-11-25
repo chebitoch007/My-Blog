@@ -1,6 +1,5 @@
-from typing import Any
-
-from ckeditor.fields import RichTextField
+# models.py
+import math
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils.text import slugify
@@ -21,10 +20,6 @@ class Category(models.Model):
         if not self.slug:
             self.slug = slugify(self.name)
         super().save(*args, **kwargs)
-
-
-class Tag(models.Model):
-    name = models.CharField(max_length=50, unique=True)
 
 class Post(models.Model):
     STATUS_CHOICES = (
@@ -57,7 +52,11 @@ class Post(models.Model):
     def get_absolute_url(self):
         return reverse('post_detail', kwargs={'slug': self.slug})
 
-
+    def get_read_time(self):
+        """Calculates read time assuming 200 words per minute."""
+        word_count = len(self.content.split())
+        read_time = math.ceil(word_count / 200)
+        return read_time
 
 class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
@@ -65,7 +64,7 @@ class Comment(models.Model):
     email = models.EmailField()
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
-    active = models.BooleanField(default=False)
+    active = models.BooleanField(default=False) # Requires admin approval in this logic
 
     class Meta:
         ordering = ['created_at']

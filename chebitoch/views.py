@@ -1,18 +1,25 @@
+from django.db.models import Q
 from django.shortcuts import render, get_object_or_404, redirect
 from django.core.paginator import Paginator
 from django.contrib import messages
 from .models import Post, Category, Comment
-import math
-
-
-def reading_time(text):
-    words = len(text.split())
-    return math.ceil(words / 200)
 
 def search(request):
     query = request.GET.get('q')
-    posts = Post.objects.filter(title__icontains=query, status='published') if query else []
-    return render(request, 'chebitoch/search.html', {'posts': posts, 'query': query})
+    results = []
+    categories = Category.objects.all()  # Required for Navbar
+
+    if query:
+        results = Post.objects.filter(
+            Q(title__icontains=query) | Q(content__icontains=query),
+            status='published'
+        ).distinct()
+
+    return render(request, 'chebitoch/search.html', {
+        'query': query,
+        'results': results,
+        'categories': categories
+    })
 
 def home(request):
     posts = Post.objects.filter(status='published')
@@ -29,11 +36,10 @@ def home(request):
     }
     return render(request, 'chebitoch/home.html', context)
 
-
 def post_detail(request, slug):
     post = get_object_or_404(Post, slug=slug, status='published')
     comments = post.comments.filter(active=True)
-    related_posts = Post.objects.filter(category=post.category).exclude(id=post.id)[:3]
+    categories = Category.objects.all() # Added for navbar consistency
 
     if request.method == 'POST':
         name = request.POST.get('name')
@@ -53,9 +59,9 @@ def post_detail(request, slug):
     context = {
         'post': post,
         'comments': comments,
+        'categories': categories,
     }
     return render(request, 'chebitoch/post_detail.html', context)
-
 
 def category_posts(request, slug):
     category = get_object_or_404(Category, slug=slug)
@@ -73,6 +79,6 @@ def category_posts(request, slug):
     }
     return render(request, 'chebitoch/category_posts.html', context)
 
-
 def about(request):
-    return render(request, 'chebitoch/about.html')
+    categories = Category.objects.all() # Added for navbar consistency
+    return render(request, 'chebitoch/about.html', {'categories': categories})

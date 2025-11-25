@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-f$ec^$3gg*rc#3_7zys-z!6d2+xgnfm^a*_=f7=2*n-+#ek-g1
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['.pythonanywhere.com', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'chebitoch',
-    'ckeditor',
+    'django_ckeditor_5',
 ]
 
 MIDDLEWARE = [
@@ -73,15 +73,9 @@ WSGI_APPLICATION = 'MyBlog.wsgi.application'
 
 
 # Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': env.db(),  # This automatically parses the DATABASE_URL
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -117,7 +111,17 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+#STATIC_URL = 'static/'
+# ================== Static & Media Files ==================
+STATICFILES_DIRS = [
+    BASE_DIR / 'chebitoch/static',
+    BASE_DIR / 'static',
+]
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+"""STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'"""
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -125,3 +129,21 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 ADMIN_URL = env("ADMIN_URL", default="admin")
+
+CKEDITOR_5_FILE_STORAGE = "django_ckeditor_5.storage.FileSystemStorage"
+
+CKEDITOR_5_CONFIGS = {
+    "default": {
+        "toolbar": [
+            "heading", "|",
+            "bold", "italic", "underline", "strikethrough", "|",
+            "bulletedList", "numberedList", "|",
+            "link", "blockQuote", "|",
+            "imageUpload", "mediaEmbed", "|",
+            "undo", "redo"
+        ],
+        "height": "300px",
+        "width": "100%",
+        "language": "en",
+    }
+}
