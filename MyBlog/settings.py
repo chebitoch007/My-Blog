@@ -19,16 +19,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-f$ec^$3gg*rc#3_7zys-z!6d2+xgnfm^a*_=f7=2*n-+#ek-g1'
+# Read SECRET_KEY from environment, or crash if missing (safety check)
+SECRET_KEY = env("SECRET_KEY")
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Read DEBUG from environment, default to False for production
+DEBUG = env.bool("DEBUG", default=False)
 
-ALLOWED_HOSTS = ['.pythonanywhere.com', 'localhost', '127.0.0.1']
+# Allow hosts specified in environment (Render provides the URL dynamically)
+# We default to allowing all (*) to make deployment easier, but you can restrict this later.
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=['*'])
 
-
-# Application definition
+# Trust Render's proxy to handle HTTPS correctly
+CSRF_TRUSTED_ORIGINS = ['https://*.onrender.com']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
