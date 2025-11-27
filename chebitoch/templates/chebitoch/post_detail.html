@@ -46,7 +46,7 @@
                         prose-a:text-violet-600 hover:prose-a:text-violet-500
                         prose-img:rounded-2xl prose-img:shadow-lg
                         prose-blockquote:border-l-4 prose-blockquote:border-violet-500 prose-blockquote:bg-slate-50 prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:rounded-r-lg">
-                {{ post.content|linebreaks }}
+                {{ post.content|safe }}
             </div>
 
             <div class="mt-12 pt-8 border-t border-slate-100">
