@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+
+Sitemap: {{ request.scheme }}://{{ request.get_host }}/sitemap.xml
+
+# Block admin and sensitive areas
+Disallow: /secure-panel-93b4c7f2/
+Disallow: /media/private/
+
+# Allow images and static files
+Allow: /static/
+Allow: /media/

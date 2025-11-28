@@ -1,87 +1,192 @@
 {% extends 'chebitoch/base.html' %}
 
-{% block title %}{{ post.title }} - Chebitoch{% endblock %}
+{% block meta_title %}{{ post.meta_title|default:post.title }} - Chebitoch{% endblock %}
+{% block page_title %}{{ post.meta_title|default:post.title }}{% endblock %}
+{% block meta_description %}{{ post.meta_description }}{% endblock %}
+{% block meta_keywords %}{{ post.keywords }}{% endblock %}
+
+{% block og_type %}article{% endblock %}
+{% block og_title %}{{ post.title }}{% endblock %}
+{% block og_description %}{{ post.meta_description }}{% endblock %}
+{% block og_image %}{{ post.featured_image|default:'https://chebitoch-blog.s3.amazonaws.com/static/images/og-default.jpg' }}{% endblock %}
+
+{% block twitter_title %}{{ post.title }}{% endblock %}
+{% block twitter_description %}{{ post.meta_description }}{% endblock %}
+{% block twitter_image %}{{ post.featured_image|default:'https://chebitoch-blog.s3.amazonaws.com/static/images/og-default.jpg' }}{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "{{ post.title|escapejs }}",
+    "description": "{{ post.meta_description|escapejs }}",
+    "image": "{{ post.featured_image|default:'https://chebitoch-blog.s3.amazonaws.com/static/images/og-default.jpg' }}",
+    "datePublished": "{{ post.created_at|date:'c' }}",
+    "dateModified": "{{ post.updated_at|date:'c' }}",
+    "author": {
+        "@type": "Person",
+        "name": "{{ post.author.username }}"
+    },
+    "publisher": {
+        "@type": "Organization",
+        "name": "Chebitoch",
+        "logo": {
+            "@type": "ImageObject",
+            "url": "{{ request.scheme }}://{{ request.get_host }}/static/logo.png"
+        }
+    },
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "{{ request.build_absolute_uri }}"
+    },
+    "wordCount": "{{ post.content|striptags|wordcount }}",
+    "timeRequired": "PT{{ post.get_read_time }}M",
+    "articleSection": "{{ post.category.name|default:'General' }}"
+}
+</script>
+
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+        {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "{{ request.scheme }}://{{ request.get_host }}"
+        },
+        {% if post.category %}
+        {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "{{ post.category.name }}",
+            "item": "{{ request.scheme }}://{{ request.get_host }}{% url 'category_posts' post.category.slug %}"
+        },
+        {
+            "@type": "ListItem",
+            "position": 3,
+            "name": "{{ post.title }}",
+            "item": "{{ request.build_absolute_uri }}"
+        }
+        {% else %}
+        {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "{{ post.title }}",
+            "item": "{{ request.build_absolute_uri }}"
+        }
+        {% endif %}
+    ]
+}
+</script>
+{% endblock %}
 
 {% block content %}
-<div class="relative h-[50vh] min-h-[400px] w-full overflow-hidden">
-    <div class="absolute inset-0 bg-slate-900/60 z-10"></div>
-    {% if post.featured_image %}
-    <img src="{{ post.featured_image }}" class="absolute inset-0 w-full h-full object-cover">
-    {% else %}
-    <div class="absolute inset-0 bg-gradient-to-r from-violet-600 to-indigo-600"></div>
-    {% endif %}
+<article itemscope itemtype="https://schema.org/BlogPosting">
+    <div class="relative h-[50vh] min-h-[400px] w-full overflow-hidden">
+        <div class="absolute inset-0 bg-slate-900/60 z-10"></div>
+        {% if post.featured_image %}
+        <img src="{{ post.featured_image }}"
+             alt="{{ post.title }}"
+             class="absolute inset-0 w-full h-full object-cover"
+             itemprop="image"
+             loading="eager"
+             width="1200"
+             height="630">
+        {% else %}
+        <div class="absolute inset-0 bg-gradient-to-r from-violet-600 to-indigo-600"></div>
+        {% endif %}
 
-    <div class="absolute inset-0 z-20 flex items-center justify-center">
-        <div class="max-w-4xl px-4 text-center text-white">
-            {% if post.category %}
-            <a href="{% url 'category_posts' post.category.slug %}" class="inline-block px-4 py-1.5 border border-white/30 bg-white/10 backdrop-blur-md rounded-full text-sm font-bold uppercase tracking-wider mb-6 hover:bg-white/20 transition-colors">
-                {{ post.category.name }}
-            </a>
-            {% endif %}
-            <h1 class="text-3xl md:text-5xl lg:text-6xl font-extrabold mb-6 leading-tight tracking-tight drop-shadow-lg">
-                {{ post.title }}
-            </h1>
-            <div class="flex items-center justify-center space-x-6 text-sm md:text-base text-white/90 font-medium">
-                <div class="flex items-center">
-                    <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center mr-2 text-xs">
-                        {{ post.author.username|slice:":1"|upper }}
+        <div class="absolute inset-0 z-20 flex items-center justify-center">
+            <div class="max-w-4xl px-4 text-center text-white">
+                {% if post.category %}
+                <a href="{% url 'category_posts' post.category.slug %}" class="inline-block px-4 py-1.5 border border-white/30 bg-white/10 backdrop-blur-md rounded-full text-sm font-bold uppercase tracking-wider mb-6 hover:bg-white/20 transition-colors">
+                    {{ post.category.name }}
+                </a>
+                {% endif %}
+                <h1 class="text-3xl md:text-5xl lg:text-6xl font-extrabold mb-6 leading-tight tracking-tight drop-shadow-lg" itemprop="headline">
+                    {{ post.title }}
+                </h1>
+                <div class="flex items-center justify-center space-x-6 text-sm md:text-base text-white/90 font-medium">
+                    <div class="flex items-center" itemprop="author" itemscope itemtype="https://schema.org/Person">
+                        <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center mr-2 text-xs">
+                            {{ post.author.username|slice:":1"|upper }}
+                        </div>
+                        <span itemprop="name">{{ post.author.username }}</span>
                     </div>
-                    {{ post.author.username }}
+                    <span>&bull;</span>
+                    <time datetime="{{ post.created_at|date:'c' }}" itemprop="datePublished">{{ post.created_at|date:"F d, Y" }}</time>
+                    <span>&bull;</span>
+                    <div>{{ post.get_read_time }} min read</div>
                 </div>
-                <span>&bull;</span>
-                <div>{{ post.created_at|date:"F d, Y" }}</div>
-                <span>&bull;</span>
-                <div>{{ post.get_read_time }} min read</div>
             </div>
         </div>
     </div>
-</div>
 
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-20 relative z-30 pb-20">
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-20 relative z-30 pb-20">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
 
-        <article class="lg:col-span-8 bg-white rounded-2xl shadow-xl p-8 md:p-12 border border-slate-100">
-            <div class="prose prose-lg prose-slate max-w-none
-                        prose-headings:font-bold prose-headings:text-slate-900
-                        prose-a:text-violet-600 hover:prose-a:text-violet-500
-                        prose-img:rounded-2xl prose-img:shadow-lg
-                        prose-blockquote:border-l-4 prose-blockquote:border-violet-500 prose-blockquote:bg-slate-50 prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:rounded-r-lg">
-                {{ post.content|safe }}
-            </div>
+            <div class="lg:col-span-8 bg-white rounded-2xl shadow-xl p-8 md:p-12 border border-slate-100">
+                <div class="prose prose-lg prose-slate max-w-none
+                            prose-headings:font-bold prose-headings:text-slate-900
+                            prose-a:text-violet-600 hover:prose-a:text-violet-500
+                            prose-img:rounded-2xl prose-img:shadow-lg
+                            prose-blockquote:border-l-4 prose-blockquote:border-violet-500 prose-blockquote:bg-slate-50 prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:rounded-r-lg"
+                     itemprop="articleBody">
+                    {{ post.content|safe }}
+                </div>
 
-            <div class="mt-12 pt-8 border-t border-slate-100">
-                <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wide mb-4">Share this post</h3>
-                <div class="flex space-x-3">
-                    <button class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-all flex items-center justify-center">
-                        <i class="fab fa-facebook-f"></i>
-                    </button>
-                    <button class="w-10 h-10 rounded-full bg-sky-50 text-sky-500 hover:bg-sky-500 hover:text-white transition-all flex items-center justify-center">
-                        <i class="fab fa-twitter"></i>
-                    </button>
-                    <button class="w-10 h-10 rounded-full bg-green-50 text-green-600 hover:bg-green-600 hover:text-white transition-all flex items-center justify-center">
-                        <i class="fab fa-whatsapp"></i>
-                    </button>
+                <meta itemprop="dateModified" content="{{ post.updated_at|date:'c' }}">
+                <meta itemprop="wordCount" content="{{ post.content|striptags|wordcount }}">
+
+                <div class="mt-12 pt-8 border-t border-slate-100">
+                    <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wide mb-4">Share this post</h3>
+                    <div class="flex space-x-3">
+                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           aria-label="Share on Facebook"
+                           class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-all flex items-center justify-center">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}&text={{ post.title|urlencode }}"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           aria-label="Share on Twitter"
+                           class="w-10 h-10 rounded-full bg-sky-50 text-sky-500 hover:bg-sky-500 hover:text-white transition-all flex items-center justify-center">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="https://wa.me/?text={{ post.title|urlencode }}%20{{ request.build_absolute_uri }}"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           aria-label="Share on WhatsApp"
+                           class="w-10 h-10 rounded-full bg-green-50 text-green-600 hover:bg-green-600 hover:text-white transition-all flex items-center justify-center">
+                            <i class="fab fa-whatsapp"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
-        </article>
 
-        <aside class="lg:col-span-4 space-y-8">
-            <div class="bg-white rounded-2xl shadow-lg p-8 border border-slate-100 text-center sticky top-24">
-                <div class="w-20 h-20 bg-gradient-to-br from-violet-500 to-fuchsia-500 rounded-full mx-auto flex items-center justify-center text-3xl font-bold text-white mb-4 shadow-lg ring-4 ring-white">
-                    {{ post.author.username|slice:":1"|upper }}
+            <aside class="lg:col-span-4 space-y-8">
+                <div class="bg-white rounded-2xl shadow-lg p-8 border border-slate-100 text-center sticky top-24">
+                    <div class="w-20 h-20 bg-gradient-to-br from-violet-500 to-fuchsia-500 rounded-full mx-auto flex items-center justify-center text-3xl font-bold text-white mb-4 shadow-lg ring-4 ring-white">
+                        {{ post.author.username|slice:":1"|upper }}
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900">{{ post.author.username }}</h3>
+                    <p class="text-slate-500 text-sm mb-6 mt-2">Content Creator & Tech Enthusiast</p>
+                    <button class="w-full py-2.5 px-4 bg-slate-900 text-white rounded-xl hover:bg-violet-600 transition-colors text-sm font-bold shadow-lg hover:shadow-violet-500/30">
+                        Follow Author
+                    </button>
                 </div>
-                <h3 class="text-xl font-bold text-slate-900">{{ post.author.username }}</h3>
-                <p class="text-slate-500 text-sm mb-6 mt-2">Content Creator & Tech Enthusiast</p>
-                <button class="w-full py-2.5 px-4 bg-slate-900 text-white rounded-xl hover:bg-violet-600 transition-colors text-sm font-bold shadow-lg hover:shadow-violet-500/30">
-                    Follow Author
-                </button>
-            </div>
-        </aside>
+            </aside>
 
+        </div>
     </div>
-</div>
+</article>
 
-<div class="bg-slate-50 py-16 border-t border-slate-200">
+<section class="bg-slate-50 py-16 border-t border-slate-200">
     <div class="max-w-3xl mx-auto px-4">
         <h2 class="text-2xl font-bold text-slate-900 mb-8 flex items-center">
             Comments <span class="ml-2 px-3 py-1 bg-violet-100 text-violet-600 text-sm rounded-full">{{ comments.count }}</span>
@@ -89,20 +194,35 @@
 
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 mb-12">
             <h3 class="text-lg font-bold text-slate-900 mb-6">Leave a thought</h3>
-            <form method="post" class="space-y-4">
+            <form method="post" class="space-y-4" novalidate>
                 {% csrf_token %}
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <input type="text" name="name" placeholder="Name" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 outline-none transition-all">
-                    <input type="email" name="email" placeholder="Email" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 outline-none transition-all">
+                    <input type="text"
+                           name="name"
+                           placeholder="Name"
+                           required
+                           aria-label="Your name"
+                           class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 outline-none transition-all">
+                    <input type="email"
+                           name="email"
+                           placeholder="Email"
+                           required
+                           aria-label="Your email"
+                           class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 outline-none transition-all">
                 </div>
-                <textarea name="content" rows="4" placeholder="Your comment..." required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 outline-none transition-all"></textarea>
+                <textarea name="content"
+                          rows="4"
+                          placeholder="Your comment..."
+                          required
+                          aria-label="Your comment"
+                          class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 outline-none transition-all"></textarea>
                 <button type="submit" class="px-8 py-3 bg-violet-600 text-white font-bold rounded-xl hover:bg-violet-700 transition-colors shadow-lg hover:shadow-violet-500/25">
                     Post Comment
                 </button>
             </form>
         </div>
 
-        <div class="space-y-6">
+        <div class="space-y-6" itemscope itemtype="https://schema.org/Comment">
             {% for comment in comments %}
             <div class="flex space-x-4 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
                 <div class="flex-shrink-0">
@@ -112,10 +232,10 @@
                 </div>
                 <div>
                     <div class="flex items-center space-x-2 mb-1">
-                        <h4 class="font-bold text-slate-900">{{ comment.name }}</h4>
-                        <span class="text-xs text-slate-400">&bull; {{ comment.created_at|timesince }} ago</span>
+                        <h4 class="font-bold text-slate-900" itemprop="author">{{ comment.name }}</h4>
+                        <time class="text-xs text-slate-400" datetime="{{ comment.created_at|date:'c' }}" itemprop="datePublished">&bull; {{ comment.created_at|timesince }} ago</time>
                     </div>
-                    <p class="text-slate-600 leading-relaxed">{{ comment.content }}</p>
+                    <p class="text-slate-600 leading-relaxed" itemprop="text">{{ comment.content }}</p>
                 </div>
             </div>
             {% empty %}
@@ -123,5 +243,5 @@
             {% endfor %}
         </div>
     </div>
-</div>
+</section>
 {% endblock %}

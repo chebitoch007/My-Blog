@@ -11,26 +11,29 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Read .env file
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
-
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
-
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
-
 # Read SECRET_KEY from environment, or crash if missing (safety check)
 SECRET_KEY = env("SECRET_KEY")
 
 # Read DEBUG from environment, default to False for production
 DEBUG = env.bool("DEBUG", default=False)
 
-# Allow hosts specified in environment (Render provides the URL dynamically)
-# We default to allowing all (*) to make deployment easier, but you can restrict this later.
+# Allow hosts specified in environment
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=['*'])
 
 # Trust Render's proxy to handle HTTPS correctly
 CSRF_TRUSTED_ORIGINS = ['https://*.onrender.com']
+
+# Security settings for production
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    X_FRAME_OPTIONS = 'DENY'
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -39,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sitemaps',  # For SEO
     'chebitoch',
     'django_ckeditor_5',
     'storages',
@@ -46,12 +50,14 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Serve static files efficiently
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.gzip.GZipMiddleware',  # Compress responses
 ]
 
 ROOT_URLCONF = 'MyBlog.urls'
@@ -59,7 +65,7 @@ ROOT_URLCONF = 'MyBlog.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],  # Django will look in app/templates/
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -74,15 +80,15 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'MyBlog.wsgi.application'
 
-
 # Database
 DATABASES = {
-    'default': env.db(),  # This automatically parses the DATABASE_URL
+    'default': env.db(),
 }
 
-# Password validation
-# https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
+# Connection pooling for better performance
+DATABASES['default']['CONN_MAX_AGE'] = 600
 
+# Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -98,24 +104,44 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
-# https://docs.djangoproject.com/en/5.2/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_TZ = True
 
+# ================== CACHING CONFIGURATION ==================
+# FIXED: Use django_redis backend properly
+if env("REDIS_URL", default=None):
+    # ================== CACHING CONFIGURATION ==================
+    if env("REDIS_URL", default=None):
+        CACHES = {
+            'default': {
+                'BACKEND': 'django_redis.cache.RedisCache',
+                'LOCATION': env("REDIS_URL"),
+                'OPTIONS': {
+                    'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+                    'CONNECTION_POOL_CLASS_KWARGS': {
+                        'max_connections': 50,
+                        'retry_on_timeout': True,
+                    },
+                    'SOCKET_CONNECT_TIMEOUT': 5,
+                    'SOCKET_TIMEOUT': 5,
+                },
+                'KEY_PREFIX': 'chebitoch',
+                'TIMEOUT': 300,
+            }
+        }
+else:
+    # Fallback to local memory cache for development
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'unique-snowflake',
+        }
+    }
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.2/howto/static-files/
-
-# AWS S3 SETTINGS
-# We use env.str() to get keys. If they exist, we use S3.
+# ================== AWS S3 SETTINGS ==================
 if env("AWS_ACCESS_KEY_ID", default=None):
     AWS_ACCESS_KEY_ID = env("AWS_ACCESS_KEY_ID")
     AWS_SECRET_ACCESS_KEY = env("AWS_SECRET_ACCESS_KEY")
@@ -125,72 +151,48 @@ if env("AWS_ACCESS_KEY_ID", default=None):
     AWS_S3_OBJECT_PARAMETERS = {
         "CacheControl": "max-age=86400",
     }
-
-    # This makes sure files overwrite enabled so you don't get messy filenames
     AWS_S3_FILE_OVERWRITE = False
+    AWS_DEFAULT_ACL = None
 
-    # "public-read" makes sure your blog images are visible to visitors (Changed to None after error)
-    AWS_DEFAULT_ACL = None # Allow S3 Bucket Policy to handle permissions
-
-    # This configures Django to use S3 for storage
     STORAGES = {
         "default": {
             "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
             "OPTIONS": {
-                "location": "media",  # Stores media in a 'media' folder on S3
+                "location": "media",
             },
         },
         "staticfiles": {
             "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
             "OPTIONS": {
-                "location": "static",  # Stores static files in a 'static' folder on S3
+                "location": "static",
             },
         },
     }
 
-    # Point CKEditor 5 to the default storage (which is now S3)
     CKEDITOR_5_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
-
-    # Override URLs to point to S3
     STATIC_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/static/"
     MEDIA_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/media/"
 
 else:
-    # LOCAL DEVELOPMENT SETTINGS (Keep these as they were)
+    # LOCAL DEVELOPMENT SETTINGS
     STATIC_URL = '/static/'
     STATIC_ROOT = BASE_DIR / 'staticfiles'
     MEDIA_URL = '/media/'
     MEDIA_ROOT = BASE_DIR / 'media'
-    # Use local file storage for CKEditor locally
     CKEDITOR_5_FILE_STORAGE = "django_ckeditor_5.storage.FileSystemStorage"
 
-"""
-#STATIC_URL = 'static/'
-# ================== Static & Media Files ==================
+# ================== GLOBAL STATIC FILES CONFIG ==================
 STATICFILES_DIRS = [
     BASE_DIR / 'chebitoch/static',
     BASE_DIR / 'static',
 ]
-STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-#STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
 
-"""
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
+# Use WhiteNoise for efficient static file serving
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 ADMIN_URL = env("ADMIN_URL", default="admin")
-
-
-# ================== GLOBAL STATIC FILES CONFIG ==================
-# This tells Django where to look for your CSS/JS files locally
-STATICFILES_DIRS = [
-    BASE_DIR / 'chebitoch/static',
-    BASE_DIR / 'static',
-]
 
 # ================== CKEDITOR CONFIGURATION ==================
 CKEDITOR_5_CONFIGS = {
@@ -207,4 +209,26 @@ CKEDITOR_5_CONFIGS = {
         "width": "100%",
         "language": "en",
     }
+}
+
+# ================== LOGGING FOR PRODUCTION ==================
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
 }
